@@ -74,14 +74,14 @@ class Main:
         if self.crashlog:
             crashlog_path = ''
             items = []
-            if xbmc.getCondVisibility('system.platform.osx'): # untested, need confirmation this is the correct path/filename
+            if xbmc.getCondVisibility('system.platform.osx'):
                 crashlog_path = os.path.join(os.path.expanduser('~'), 'Library/Logs/DiagnosticReports/')
                 filematch = 'Kodi'
-            elif xbmc.getCondVisibility('system.platform.ios'): # untested, need confirmation this is the correct path/filename
+            elif xbmc.getCondVisibility('system.platform.ios'):
                 crashlog_path = '/var/mobile/Library/Logs/CrashReporter/'
                 filematch = 'Kodi'
             elif xbmc.getCondVisibility('system.platform.linux'):
-                crashlog_path = os.path.expanduser('~') # not 100% accurate, crashlogs can be created in the dir kodi was started from as well
+                crashlog_path = os.path.expanduser('~') # not 100% accurate (crashlogs can be created in the dir kodi was started from as well)
                 filematch = 'kodi_crashlog'
             elif xbmc.getCondVisibility('system.platform.windows'):
                 self.showResult(LANGUAGE(32023))
