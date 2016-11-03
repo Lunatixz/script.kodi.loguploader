@@ -25,7 +25,6 @@ LOGFILE  = os.path.join(LOGPATH, 'kodi.log')
 OLDLOG   = os.path.join(LOGPATH, 'kodi.old.log')
 REPLACES = (('//.+?:.+?@', '//USER:PASSWORD@'),('<user>.+?</user>', '<user>USER</user>'),('<pass>.+?</pass>', '<pass>PASSWORD</pass>'),)
 IMAGEFILE= os.path.join(xbmc.translatePath(CWD),'temp.png')
-SOLID    = os.path.join(xbmc.translatePath(CWD),'solid.jpg')
 
 def log(txt):
     if isinstance (txt,str):
