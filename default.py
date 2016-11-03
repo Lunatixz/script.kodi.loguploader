@@ -34,24 +34,38 @@ def log(txt):
     xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)
 
 class QRCode(xbmcgui.WindowDialog):
-    def __init__(self, url, message):
-        xpos = self.getWidth()
-        ypos = self.getHeight()
-        center = [xpos/2,ypos/2]
-        qrDEM  = [ypos/2,ypos/2] 
-        laDEM  = [xpos,120]
-        
-        if url:
-            url = pyqrcode.create(url)
-            url.png(IMAGEFILE, scale=10, module_color=(255, 255, 255, 255), background=(0, 0, 0, 255)) 
-            self.addControl(xbmcgui.ControlImage(0, 0, 1920, 1080, SOLID))
-            self.addControl(xbmcgui.ControlImage(center[0], center[1], qrDEM[0], qrDEM[1], IMAGEFILE))
-            self.addControl(xbmcgui.ControlLabel(xpos/4, ypos/4, laDEM[0], laDEM[1], label=message))
-            self.show()
-        else:
-            dialog = xbmcgui.Dialog()
-            confirm = dialog.ok(ADDONNAME, message)
-    
+    def __init__(self, url, message):        
+        url = pyqrcode.create(url)
+        url.png(IMAGEFILE, scale=10, module_color=(255, 255, 255, 255), background=(0, 0, 0, 255)) 
+        self.showWindow(message)
+ 
+    def showWindow(self, text, heading=ADDONNAME):
+        id = 10147
+        xbmc.executebuiltin('ActivateWindow(%d)' % id)
+        xbmc.sleep(100)
+        win = xbmcgui.Window(id)
+        retry = 50
+        while (retry > 0):
+            try:
+                xbmc.sleep(10)
+                retry -= 1
+                win.getControl(1).setLabel(heading)
+                win.getControl(5).setText(text)
+                winWidth =  win.getWidth()
+                winHeight = win.getHeight()
+                self.addControl(xbmcgui.ControlImage(winWidth/2 - (winWidth/3 // 2), winHeight/2 - (winWidth/3 // 2), winWidth/3, winWidth/3, IMAGEFILE))
+                # self.addControl(xbmcgui.ControlLabel(xpos/4, ypos/4, laDEM[0], laDEM[1], label=message))
+                self.show()
+                return
+            except:
+                pass
+          
+    # def onClick(self, controlid):
+        # self.close()
+ 
+    # def onAction(self, act):
+        # self.close()
+             
 # Custom urlopener to set user-agent
 class pasteURLopener(FancyURLopener):
     version = '%s: %s' % (ADDONID, ADDONVERSION)
@@ -149,7 +163,7 @@ class Main:
         params['content'] = data
         params['syntax'] = 'text'
         params = urlencode(params)
-
+        return True, 'http://test'#TEMP
         url_opener = pasteURLopener()
 
         try:
@@ -167,10 +181,13 @@ class Main:
             return False, LANGUAGE(32004)
 
     def showResult(self, message, url=None):
-        qr = QRCode(url, message)
-        qr.doModal()
-        del qr
-
+        if url:
+            qr = QRCode(url, message)
+            qr.doModal()
+            del qr
+        else:
+            dialog = xbmcgui.Dialog()
+            confirm = dialog.ok(ADDONNAME, message)
 if ( __name__ == '__main__' ):
     log('script version %s started' % ADDONVERSION)
     Main()
