@@ -1,6 +1,8 @@
 import os
 import re
 import socket
+import pyqrcode
+import sys
 from urllib import urlencode
 from urllib import FancyURLopener
 import xbmc
@@ -22,6 +24,8 @@ LOGPATH  = xbmc.translatePath('special://logpath')
 LOGFILE  = os.path.join(LOGPATH, 'kodi.log')
 OLDLOG   = os.path.join(LOGPATH, 'kodi.old.log')
 REPLACES = (('//.+?:.+?@', '//USER:PASSWORD@'),('<user>.+?</user>', '<user>USER</user>'),('<pass>.+?</pass>', '<pass>PASSWORD</pass>'),)
+IMAGEFILE= os.path.join(xbmc.translatePath(CWD),'temp.png')
+SOLID    = os.path.join(xbmc.translatePath(CWD),'solid.jpg')
 
 def log(txt):
     if isinstance (txt,str):
@@ -29,6 +33,27 @@ def log(txt):
     message = u'%s: %s' % (ADDONID, txt)
     xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)
 
+class QRCode(xbmcgui.WindowDialog):
+    def __init__(self, url, message):
+        xpos = self.getWidth()
+        ypos = self.getHeight()
+        center = [xpos/2,ypos/2]
+        qrDEM  = [ypos/2,ypos/2] 
+        laDEM  = [xpos,30]
+        
+        if url:
+            url = pyqrcode.create(url)
+            url.png(IMAGEFILE, scale=10)
+            solid = xbmcgui.ControlImage(xpos/4, ypos/4, laDEM[0], laDEM[1], SOLID)
+            self.addControl(solid)
+            image = xbmcgui.ControlImage(center[0], center[1], qrDEM[0], qrDEM[1], IMAGEFILE)
+            self.addControl(image)
+            self.addControl(xbmcgui.ControlLabel(xpos/4, ypos/4, laDEM[0], laDEM[1], label=message, font='font24_title', textColor='0xFFFFFFFF'))
+            self.show()
+        else:
+            dialog = xbmcgui.Dialog()
+            confirm = dialog.ok(ADDONNAME, message)
+    
 # Custom urlopener to set user-agent
 class pasteURLopener(FancyURLopener):
     version = '%s: %s' % (ADDONID, ADDONVERSION)
@@ -53,7 +78,7 @@ class Main:
                 content = self.cleanLog(data)
                 succes, result = self.postLog(content)
                 if succes:
-                    self.showResult(LANGUAGE(32005) % (name, result))
+                    self.showResult(LANGUAGE(32006) % (name, result),result)
                 else:
                     self.showResult('%s[CR]%s' % (error, result))
             else:
@@ -143,9 +168,10 @@ class Main:
             log('unable to retrieve the paste url')
             return False, LANGUAGE(32004)
 
-    def showResult(self, message):
-        dialog = xbmcgui.Dialog()
-        confirm = dialog.ok(ADDONNAME, message)
+    def showResult(self, message, url=None):
+        qr = QRCode(url, message)
+        qr.doModal()
+        del qr
 
 if ( __name__ == '__main__' ):
     log('script version %s started' % ADDONVERSION)
