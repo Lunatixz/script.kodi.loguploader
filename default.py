@@ -163,7 +163,7 @@ class Main:
         params['content'] = data
         params['syntax'] = 'text'
         params = urlencode(params)
-        return True, 'http://test'#TEMP
+        # return True, 'http://test'#TEST
         url_opener = pasteURLopener()
 
         try:
