@@ -39,16 +39,14 @@ class QRCode(xbmcgui.WindowDialog):
         ypos = self.getHeight()
         center = [xpos/2,ypos/2]
         qrDEM  = [ypos/2,ypos/2] 
-        laDEM  = [xpos,30]
+        laDEM  = [xpos,120]
         
         if url:
             url = pyqrcode.create(url)
-            url.png(IMAGEFILE, scale=10)
-            solid = xbmcgui.ControlImage(xpos/4, ypos/4, laDEM[0], laDEM[1], SOLID)
-            self.addControl(solid)
-            image = xbmcgui.ControlImage(center[0], center[1], qrDEM[0], qrDEM[1], IMAGEFILE)
-            self.addControl(image)
-            self.addControl(xbmcgui.ControlLabel(xpos/4, ypos/4, laDEM[0], laDEM[1], label=message, font='font24_title', textColor='0xFFFFFFFF'))
+            url.png(IMAGEFILE, scale=10, module_color=(255, 255, 255, 255), background=(0, 0, 0, 255)) 
+            self.addControl(xbmcgui.ControlImage(0, 0, 1920, 1080, SOLID))
+            self.addControl(xbmcgui.ControlImage(center[0], center[1], qrDEM[0], qrDEM[1], IMAGEFILE))
+            self.addControl(xbmcgui.ControlLabel(xpos/4, ypos/4, laDEM[0], laDEM[1], label=message))
             self.show()
         else:
             dialog = xbmcgui.Dialog()
@@ -78,7 +76,7 @@ class Main:
                 content = self.cleanLog(data)
                 succes, result = self.postLog(content)
                 if succes:
-                    self.showResult(LANGUAGE(32006) % (name, result),result)
+                    self.showResult(LANGUAGE(32006) % (name, result), result)
                 else:
                     self.showResult('%s[CR]%s' % (error, result))
             else:
