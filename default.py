@@ -25,6 +25,7 @@ LOGFILE  = os.path.join(LOGPATH, 'kodi.log')
 OLDLOG   = os.path.join(LOGPATH, 'kodi.old.log')
 REPLACES = (('//.+?:.+?@', '//USER:PASSWORD@'),('<user>.+?</user>', '<user>USER</user>'),('<pass>.+?</pass>', '<pass>PASSWORD</pass>'),)
 IMAGEFILE= os.path.join(xbmc.translatePath(CWD),'temp.png')
+SOLIDFILE= os.path.join(xbmc.translatePath(CWD),'solid.jpg')
 
 def log(txt):
     if isinstance (txt,str):
@@ -36,29 +37,13 @@ class QRCode(xbmcgui.WindowDialog):
     def __init__(self, url, message):        
         url = pyqrcode.create(url)
         url.png(IMAGEFILE, scale=10, module_color=(255, 255, 255, 255), background=(0, 0, 0, 255)) 
-        self.showWindow(message)
+        self.addControl(xbmcgui.ControlImage(0, 0, self.getWidth(), self.getHeight(), SOLIDFILE))
+        self.addControl(xbmcgui.ControlImage(self.getWidth()/4, 100, self.getWidth()/2, self.getWidth()/2, IMAGEFILE))
+        self.textbox = xbmcgui.ControlTextBox(100, 100, self.getWidth(), 100)
+        self.addControl(self.textbox)
+        self.textbox.setText(message)
+        self.show()
  
-    def showWindow(self, text, heading=ADDONNAME):
-        id = 10147
-        xbmc.executebuiltin('ActivateWindow(%d)' % id)
-        xbmc.sleep(100)
-        win = xbmcgui.Window(id)
-        retry = 50
-        while (retry > 0):
-            try:
-                xbmc.sleep(10)
-                retry -= 1
-                win.getControl(1).setLabel(heading)
-                win.getControl(5).setText(text)
-                winWidth =  win.getWidth()
-                winHeight = win.getHeight()
-                self.addControl(xbmcgui.ControlImage(winWidth/2 - (winWidth/3 // 2), winHeight/2 - (winWidth/3 // 2), winWidth/3, winWidth/3, IMAGEFILE))
-                # self.addControl(xbmcgui.ControlLabel(xpos/4, ypos/4, laDEM[0], laDEM[1], label=message))
-                self.show()
-                return
-            except:
-                pass
-          
     # def onClick(self, controlid):
         # self.close()
  
