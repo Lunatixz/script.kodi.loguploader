@@ -1,4 +1,5 @@
 import os
+import uuid
 import re
 import socket
 import pyqrcode
@@ -24,8 +25,8 @@ LOGPATH  = xbmc.translatePath('special://logpath')
 LOGFILE  = os.path.join(LOGPATH, 'kodi.log')
 OLDLOG   = os.path.join(LOGPATH, 'kodi.old.log')
 REPLACES = (('//.+?:.+?@', '//USER:PASSWORD@'),('<user>.+?</user>', '<user>USER</user>'),('<pass>.+?</pass>', '<pass>PASSWORD</pass>'),)
-IMAGEFILE= os.path.join(xbmc.translatePath(CWD),'temp.png')
-SOLIDFILE= os.path.join(xbmc.translatePath(CWD),'solid.jpg')
+IMAGEFILE = os.path.join(xbmc.translatePath(CWD),'temp-uuid=%s.png'%str(uuid.uuid4()))
+ALL_PROPERTIES = []
 
 def log(txt):
     if isinstance (txt,str):
@@ -33,23 +34,11 @@ def log(txt):
     message = u'%s: %s' % (ADDONID, txt)
     xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)
 
-class QRCode(xbmcgui.WindowDialog):
-    def __init__(self, url, message):        
-        url = pyqrcode.create(url)
-        url.png(IMAGEFILE, scale=10, module_color=(255, 255, 255, 255), background=(0, 0, 0, 255)) 
-        self.addControl(xbmcgui.ControlImage(0, 0, self.getWidth(), self.getHeight(), SOLIDFILE))
-        self.addControl(xbmcgui.ControlImage(self.getWidth()/4, 100, self.getWidth()/2, self.getWidth()/2, IMAGEFILE))
-        self.textbox = xbmcgui.ControlTextBox(100, 100, self.getWidth(), 100)
-        self.addControl(self.textbox)
-        self.textbox.setText(message)
-        self.show()
- 
-    # def onClick(self, controlid):
-        # self.close()
- 
-    # def onAction(self, act):
-        # self.close()
-             
+class QRCode(xbmcgui.WindowXMLDialog):
+    def __init__(self, *args, **kwargs):
+        url = pyqrcode.create(xbmcgui.Window(10000).getProperty("logouploader.qr.url"))
+        url.png(IMAGEFILE, scale=10)
+
 # Custom urlopener to set user-agent
 class pasteURLopener(FancyURLopener):
     version = '%s: %s' % (ADDONID, ADDONVERSION)
@@ -80,6 +69,24 @@ class Main:
             else:
                 self.showResult('%s[CR]%s' % (error, result))
 
+    def getProperty(self, str):
+        return xbmcgui.Window(10000).getProperty(str)
+
+    def setProperty(self, str1, str2):
+        ALL_PROPERTIES.append(str1)
+        xbmcgui.Window(10000).setProperty(str1, str2)
+            
+    def clearProperty(self, str):
+        xbmcgui.Window(10000).clearProperty(str)
+        
+    def cleanProperty(self):
+        for property in ALL_PROPERTIES:
+            self.clearProperty(property)
+        try:
+            xbmcvfs.delete(IMAGEFILE)
+        except:
+            pass
+            
     def getSettings(self):
         self.oldlog = ADDON.getSetting('oldlog') == 'true'
         self.crashlog = ADDON.getSetting('crashlog') == 'true'
@@ -147,7 +154,7 @@ class Main:
         params['content'] = data
         params['syntax'] = 'text'
         params = urlencode(params)
-        # return True, 'http://test'#TEST
+        return True, 'http://test'#TEST
         url_opener = pasteURLopener()
 
         try:
@@ -166,8 +173,12 @@ class Main:
 
     def showResult(self, message, url=None):
         if url:
-            qr = QRCode(url, message)
+            self.setProperty("logouploader.qr.image", IMAGEFILE)
+            self.setProperty("logouploader.qr.message", message)
+            self.setProperty("logouploader.qr.url", url)
+            qr = QRCode( "script-loguploader-main.xml" , CWD, "default")
             qr.doModal()
+            self.cleanProperty()
             del qr
         else:
             dialog = xbmcgui.Dialog()
