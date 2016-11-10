@@ -151,6 +151,7 @@ class Main:
         params['content'] = data
         params['syntax'] = 'text'
         params = urlencode(params)
+        # return True, 'http://test.com/123456/'#TEST
         url_opener = pasteURLopener()
 
         try:
