@@ -1,91 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <window>
-	<coordinates>
-		<left>502</left>
-		<top>345</top>
-	</coordinates>
-	<controls>
-        <control>
-            <animation type="WindowOpen" reversible="false">
-                <effect type="zoom" start="80" end="100" center="960,540" delay="160" tween="back" time="240" />
-                <effect type="fade" delay="160" end="100" time="240" />
-            </animation>
-            <animation type="WindowClose" reversible="false">
-                <effect type="zoom" start="100" end="80" center="960,540" easing="in" tween="back" time="240" />
-                <effect type="fade" start="100" end="0" time="240" />
-            </animation>
+    <coordinates>
+        <left>502</left>
+        <top>345</top>
+    </coordinates>
+    <controls>
+        <animation type="WindowOpen" reversible="false">
+            <effect type="zoom" start="80" end="100" center="960,540" delay="160" tween="back" time="240" />
+            <effect type="fade" delay="160" end="100" time="240" />
+        </animation>
+        <animation type="WindowClose" reversible="false">
+            <effect type="zoom" start="100" end="80" center="960,540" easing="in" tween="back" time="240" />
+            <effect type="fade" start="100" end="0" time="240" />
+        </animation>
+        <control type="image">
+            <left>-1920</left>
+            <top>-1080</top>
+            <width>5760</width>
+            <height>3240</height>
+            <animation effect="fade" time="300">VisibleChange</animation>
+            <animation effect="fade" start="0" end="100" time="300">WindowOpen</animation>
+            <animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
+            <texture colordiffuse="C2FFFFFF">black.png</texture>
+            <visible>true</visible>
         </control>
-		<control type="image">
-			<left>-1920</left>
-			<top>-1080</top>
-			<width>5760</width>
-			<height>3240</height>
-			<animation effect="fade" time="300">VisibleChange</animation>
-			<animation effect="fade" start="0" end="100" time="300">WindowOpen</animation>
-			<animation effect="fade" start="100" end="0" time="200">WindowClose</animation>
-			<texture colordiffuse="C2FFFFFF">black.png</texture>
-			<visible>true</visible>
-		</control>
-		<control type="image">
-			<left>0</left>
-			<top>0</top>
-			<width>915</width>
-			<height>380</height>
-			<texture border="2">dialog-bg-solid.png</texture>
-		</control>
-		<control type="image">
-			<left>0</left>
-			<top>0</top>
-			<width>915</width>
-			<height>70</height>
-			<texture colordiffuse="FF12B2E7" border="2">white.png</texture>
-		</control>
-		<control type="label">
-			<textoffsetx>70</textoffsetx>
-			<left>0</left>
-			<top>0</top>
-			<width>915</width>
-			<height>70</height>
-			<font>font20_title</font>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>915</width>
+            <height>380</height>
+            <texture border="2">dialog-bg-solid.png</texture>
+        </control>
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>915</width>
+            <height>70</height>
+            <texture colordiffuse="FF12B2E7" border="2">white.png</texture>
+        </control>
+        <control type="label">
+            <textoffsetx>70</textoffsetx>
+            <left>0</left>
+            <top>0</top>
+            <width>915</width>
+            <height>70</height>
+            <font>font20_title</font>
             <label>[B]$INFO[System.AddonTitle(script.kodi.loguploader)][/B]</label>
-			<align>center</align>
-			<aligny>center</aligny>
-			<shadowcolor>FF000000</shadowcolor>
-		</control>
-		<control type="image">
-			<left>30</left>
-			<top>75</top>
-			<width>300</width>
-			<height>300</height>
+            <align>center</align>
+            <aligny>center</aligny>
+            <shadowcolor>FF000000</shadowcolor>
+        </control>
+        <control type="image">
+            <left>30</left>
+            <top>75</top>
+            <width>300</width>
+            <height>300</height>
             <aspectratio aligny="center" align="center">keep</aspectratio>
-			<texture background="true">$INFO[Window(10000).Property(logouploader.qr.image)]</texture>
-		</control>
-		<control type="textbox">
-			<left>360</left>
-			<top>85</top>
-			<width>555</width>
-			<height>300</height>
-			<font>font12_title</font>
-			<label>$INFO[Window(10000).Property(logouploader.qr.message)]</label>
-			<align>left</align>
-			<aligny>top</aligny>
-			<shadowcolor>FF000000</shadowcolor>
-		</control>
-		<control type="button">
-			<left>600</left>
-			<top>290</top>
-			<width>300</width>
-			<height>90</height>
-			<font>font12_title</font>
+            <texture background="true">$INFO[Window(10000).Property(logouploader.qr.image)]</texture>
+        </control>
+        <control type="textbox">
+            <left>360</left>
+            <top>85</top>
+            <width>545</width>
+            <height>300</height>
+            <font>font12_title</font>
+            <label>$INFO[Window(10000).Property(logouploader.qr.message)]</label>
+            <align>left</align>
+            <aligny>top</aligny>
+            <shadowcolor>FF000000</shadowcolor>
+        </control>
+        <control type="button">
+            <left>600</left>
+            <top>290</top>
+            <width>300</width>
+            <height>90</height>
+            <font>font12_title</font>
             <textcolor>FFF0F0F0</textcolor>
             <textoffsetx>20</textoffsetx>
-			<label>Close</label>
+            <label>$ADDON[script.kodi.loguploader 32506]$LOCALIZE[32506]</label>
             <align>center</align>
-			<aligny>center</aligny>
+            <aligny>center</aligny>
             <texturefocus border="40" colordiffuse="FF12B2E7">dialogbutton-fo.png</texturefocus>
             <texturenofocus border="40">dialogbutton-nofo.png</texturenofocus>
-			<onclick>Action(close)</onclick>
-		</control>
-	</controls>
+            <onclick>Action(close)</onclick>
+        </control>
+    </controls>
 </window>
 

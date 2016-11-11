@@ -95,3 +95,7 @@ msgstr ""
 msgctxt "#32504"
 msgid "Post the crashlog (available on linux/osx/ios only)"
 msgstr ""
+
+msgctxt "#32506"
+msgid "Close"
+msgstr ""
