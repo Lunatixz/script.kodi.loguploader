@@ -14,6 +14,7 @@ ADDONID      = ADDON.getAddonInfo('id')
 ADDONNAME    = ADDON.getAddonInfo('name')
 ADDONVERSION = ADDON.getAddonInfo('version')
 CWD          = ADDON.getAddonInfo('path').decode('utf-8')
+PROFILE      = ADDON.getAddonInfo('profile').decode('utf-8')
 LANGUAGE     = ADDON.getLocalizedString
 
 socket.setdefaulttimeout(5)
@@ -49,7 +50,7 @@ def cleanProperty():
 class QRCode(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         qrURL = getProperty("logouploader.qr.url")
-        IMAGEFILE = os.path.join(xbmc.translatePath(CWD),'%s.png'%str(qrURL.split('/')[-2]))
+        IMAGEFILE = os.path.join(xbmc.translatePath(PROFILE),'%s.png'%str(qrURL.split('/')[-2]))
         setProperty("logouploader.qr.image", IMAGEFILE)
         qrIMG = pyqrcode.create(qrURL)
         qrIMG.png(IMAGEFILE, scale=10)
