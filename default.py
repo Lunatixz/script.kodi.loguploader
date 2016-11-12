@@ -1,13 +1,14 @@
 import os
 import re
 import socket
+import pyqrcode
+import sys
 from urllib import urlencode
 from urllib import FancyURLopener
 import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcvfs
-
 ADDON        = xbmcaddon.Addon()
 ADDONID      = ADDON.getAddonInfo('id')
 ADDONNAME    = ADDON.getAddonInfo('name')
@@ -22,6 +23,7 @@ LOGPATH  = xbmc.translatePath('special://logpath')
 LOGFILE  = os.path.join(LOGPATH, 'kodi.log')
 OLDLOG   = os.path.join(LOGPATH, 'kodi.old.log')
 REPLACES = (('//.+?:.+?@', '//USER:PASSWORD@'),('<user>.+?</user>', '<user>USER</user>'),('<pass>.+?</pass>', '<pass>PASSWORD</pass>'),)
+ALL_PROPERTIES = []
 
 def log(txt):
     if isinstance (txt,str):
@@ -29,6 +31,29 @@ def log(txt):
     message = u'%s: %s' % (ADDONID, txt)
     xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)
 
+def getProperty(str):
+    return xbmcgui.Window(10000).getProperty(str)
+
+def setProperty(str1, str2):
+    ALL_PROPERTIES.append(str1)
+    xbmcgui.Window(10000).setProperty(str1, str2)
+        
+def clearProperty( str):
+    xbmcgui.Window(10000).clearProperty(str)
+    
+def cleanProperty():
+    xbmcvfs.delete(getProperty("logouploader.qr.image"))
+    for property in ALL_PROPERTIES:
+        clearProperty(property)
+        
+class QRCode(xbmcgui.WindowXMLDialog):
+    def __init__(self, *args, **kwargs):
+        qrURL = getProperty("logouploader.qr.url")
+        IMAGEFILE = os.path.join(xbmc.translatePath(CWD),'%s.png'%str(qrURL.split('/')[-2]))
+        setProperty("logouploader.qr.image", IMAGEFILE)
+        qrIMG = pyqrcode.create(qrURL)
+        qrIMG.png(IMAGEFILE, scale=10)
+        
 # Custom urlopener to set user-agent
 class pasteURLopener(FancyURLopener):
     version = '%s: %s' % (ADDONID, ADDONVERSION)
@@ -53,7 +78,7 @@ class Main:
                 content = self.cleanLog(data)
                 succes, result = self.postLog(content)
                 if succes:
-                    self.showResult(LANGUAGE(32005) % (name, result))
+                    self.showResult(LANGUAGE(32006) % (name, result), result)
                 else:
                     self.showResult('%s[CR]%s' % (error, result))
             else:
@@ -126,7 +151,7 @@ class Main:
         params['content'] = data
         params['syntax'] = 'text'
         params = urlencode(params)
-
+        # return True, 'http://test.com/123456/'#TEST
         url_opener = pasteURLopener()
 
         try:
@@ -143,10 +168,17 @@ class Main:
             log('unable to retrieve the paste url')
             return False, LANGUAGE(32004)
 
-    def showResult(self, message):
-        dialog = xbmcgui.Dialog()
-        confirm = dialog.ok(ADDONNAME, message)
-
+    def showResult(self, message, url=None):
+        if url:      
+            setProperty("logouploader.qr.message", message)
+            setProperty("logouploader.qr.url", url)
+            qr = QRCode( "script-loguploader-main.xml" , CWD, "default")
+            qr.doModal()
+            cleanProperty()
+            del qr
+        else:
+            dialog = xbmcgui.Dialog()
+            confirm = dialog.ok(ADDONNAME, message)
 if ( __name__ == '__main__' ):
     log('script version %s started' % ADDONVERSION)
     Main()
