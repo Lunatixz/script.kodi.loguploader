@@ -73,11 +73,7 @@ msgid "crashlog"
 msgstr ""
 
 msgctxt "#32006"
-msgid "Post this paste url or scan QRcode for your %s, together with a problem description, on the Kodi support forum: %s"
-msgstr ""
-
-msgctxt "#32005"
-msgid "Post this paste url for your %s, together with a problem description, on the Kodi support forum: %s"
+msgid "Post this url or scan QRcode for your %s, together with a problem description, on the Kodi support forum: %s"
 msgstr ""
 
 msgctxt "#32501"
@@ -94,8 +90,4 @@ msgstr ""
 
 msgctxt "#32504"
 msgid "Post the crashlog (available on linux/osx/ios only)"
-msgstr ""
-
-msgctxt "#32506"
-msgid "Close"
 msgstr ""

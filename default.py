@@ -2,18 +2,19 @@ import os
 import re
 import socket
 import pyqrcode
-import sys
 from urllib import urlencode
 from urllib import FancyURLopener
 import xbmc
 import xbmcgui
 import xbmcaddon
 import xbmcvfs
+
 ADDON        = xbmcaddon.Addon()
 ADDONID      = ADDON.getAddonInfo('id')
 ADDONNAME    = ADDON.getAddonInfo('name')
 ADDONVERSION = ADDON.getAddonInfo('version')
 CWD          = ADDON.getAddonInfo('path').decode('utf-8')
+PROFILE      = ADDON.getAddonInfo('profile').decode('utf-8')
 LANGUAGE     = ADDON.getLocalizedString
 
 socket.setdefaulttimeout(5)
@@ -23,7 +24,6 @@ LOGPATH  = xbmc.translatePath('special://logpath')
 LOGFILE  = os.path.join(LOGPATH, 'kodi.log')
 OLDLOG   = os.path.join(LOGPATH, 'kodi.old.log')
 REPLACES = (('//.+?:.+?@', '//USER:PASSWORD@'),('<user>.+?</user>', '<user>USER</user>'),('<pass>.+?</pass>', '<pass>PASSWORD</pass>'),)
-ALL_PROPERTIES = []
 
 def log(txt):
     if isinstance (txt,str):
@@ -31,29 +31,28 @@ def log(txt):
     message = u'%s: %s' % (ADDONID, txt)
     xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)
 
-def getProperty(str):
-    return xbmcgui.Window(10000).getProperty(str)
 
-def setProperty(str1, str2):
-    ALL_PROPERTIES.append(str1)
-    xbmcgui.Window(10000).setProperty(str1, str2)
-        
-def clearProperty( str):
-    xbmcgui.Window(10000).clearProperty(str)
-    
-def cleanProperty():
-    xbmcvfs.delete(getProperty("logouploader.qr.image"))
-    for property in ALL_PROPERTIES:
-        clearProperty(property)
-        
 class QRCode(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
-        qrURL = getProperty("logouploader.qr.url")
-        IMAGEFILE = os.path.join(xbmc.translatePath(CWD),'%s.png'%str(qrURL.split('/')[-2]))
-        setProperty("logouploader.qr.image", IMAGEFILE)
-        qrIMG = pyqrcode.create(qrURL)
-        qrIMG.png(IMAGEFILE, scale=10)
-        
+        self.image = kwargs["image"]
+        self.text = kwargs["text"]
+
+    def onInit(self):
+        self.imagecontrol = 501
+        self.textbox = 502
+        self.okbutton = 503
+        self.showdialog()
+
+    def showdialog(self):
+        self.getControl(self.imagecontrol).setImage(self.image)
+        self.getControl(self.textbox).setText(self.text)
+        self.setFocus(self.getControl(self.okbutton))
+
+    def onClick(self, controlId):
+        if (controlId == self.okbutton):
+            self.close()
+
+
 # Custom urlopener to set user-agent
 class pasteURLopener(FancyURLopener):
     version = '%s: %s' % (ADDONID, ADDONVERSION)
@@ -61,6 +60,8 @@ class pasteURLopener(FancyURLopener):
 class Main:
     def __init__(self):
         self.getSettings()
+        if not xbmcvfs.exists(PROFILE):
+            xbmcvfs.mkdirs(PROFILE)
         files = self.getFiles()
         for item in files:
             filetype = item[0]
@@ -169,16 +170,18 @@ class Main:
             return False, LANGUAGE(32004)
 
     def showResult(self, message, url=None):
-        if url:      
-            setProperty("logouploader.qr.message", message)
-            setProperty("logouploader.qr.url", url)
-            qr = QRCode( "script-loguploader-main.xml" , CWD, "default")
+        if url:
+            imagefile = os.path.join(xbmc.translatePath(PROFILE),'%s.png'%str(url.split('/')[-2]))
+            qrIMG = pyqrcode.create(url)
+            qrIMG.png(imagefile, scale=10)
+            qr = QRCode( "script-loguploader-main.xml" , CWD, "default", image=imagefile, text=message)
             qr.doModal()
-            cleanProperty()
             del qr
+            xbmcvfs.delete(imagefile)
         else:
             dialog = xbmcgui.Dialog()
             confirm = dialog.ok(ADDONNAME, message)
+
 if ( __name__ == '__main__' ):
     log('script version %s started' % ADDONVERSION)
     Main()
